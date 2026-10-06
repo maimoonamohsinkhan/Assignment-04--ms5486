@@ -21,7 +21,7 @@ energy_sub <-energy |>
          year >= 2000)
 ```
 
-### Graph 1: Renewable share of electricity
+### Graph 1: Renewable Share of Electricity
 
 ```{r}
 energy_sub |>
@@ -43,6 +43,33 @@ energy_sub |>
   theme_minimal()
 ```
 Since 2000, the share of electricity generated from renewable sources has risen in most of the countries examined. The United Kingdom shows the fastest transition, growing from under 5% to over 50%, largely driven by the expansion of wind power, while China, Pakistan and the United States show slower but steady gains. Norway has remained close to 100% throughout because of its long-standing reliance on hydropower. Ghana is the major exception: its renewable share fell from about 90% to under 40% as rising electricity demand was met mainly by fossil fuels rather than new renewable capacity. This suggests that for fast-growing economies, the policy challenge is not only adding renewables but adding them quickly enough to keep pace with demand.
+
+### Graph 2:Where Countries Stand in 2024
+
+```{r}
+
+energy_sub |>
+  filter(year == 2024) |>
+  ggplot(aes(x = renewables_electricity_share_pct,
+             y = fct_reorder(country, renewables_electricity_share_pct))) +
+  geom_col(fill = "#1b9e77", width = 0.7) +
+  geom_text(aes(label = paste0(round(renewables_electricity_share_pct), "%")),
+            hjust = -0.2, size = 3.5) +
+  scale_x_continuous(limits = c(0, 110),
+                     labels = scales::label_percent(scale = 1)) +
+  labs(
+    title = "Norway gets nearly all its electricity from renewables; India gets about a fifth",
+    subtitle = "Share of electricity generated from renewable sources, 2024",
+    x = "Renewable share of electricity",
+    y = NULL,
+    caption = "Source: Our World in Data, Energy Dataset (2025)"
+  ) +
+  theme_minimal()
+
+```
+In 2024, the seven countries varied widely in how much of their electricity came from renewable sources. Norway leads at 99%, and the United Kingdom is the only other country above half, at 51%. Pakistan, Ghana and China are closely grouped between 34% and 37%, despite having very different economies and energy systems. Notably, the United States ranks second to last at 24%, ahead of only India at 20%, showing that national wealth alone does not guarantee a cleaner electricity mix.Read alongside the first graph, this also shows that similar shares can hide opposite trends: Ghana and China are nearly level in 2024, but Ghana's share has fallen sharply since 2000 while China's has roughly double
+
+
 
 
 
