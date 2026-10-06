@@ -4,6 +4,9 @@ author: Maimoona Mohsin Subhani
 format: 
   html:
     embed-resources: true
+execute:
+  warning: false
+  message: false
 ---
 
 ## Quarto
