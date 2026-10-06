@@ -69,13 +69,58 @@ energy_sub |>
 ```
 In 2024, the seven countries varied widely in how much of their electricity came from renewable sources. Norway leads at 99%, and the United Kingdom is the only other country above half, at 51%. Pakistan, Ghana and China are closely grouped between 34% and 37%, despite having very different economies and energy systems. Notably, the United States ranks second to last at 24%, ahead of only India at 20%, showing that national wealth alone does not guarantee a cleaner electricity mix.Read alongside the first graph, this also shows that similar shares can hide opposite trends: Ghana and China are nearly level in 2024, but Ghana's share has fallen sharply since 2000 while China's has roughly double
 
+### Graph 3: What countries generate electricity from
 
+```{r}
+energy_mix <- energy_sub |>
+  filter(year <= 2024) |>
+  select(country, year,
+         coal_electricity_share_pct, gas_electricity_share_pct,
+         oil_electricity_share_pct, nuclear_electricity_share_pct,
+         hydro_electricity_share_pct, wind_electricity_share_pct,
+         solar_electricity_share_pct, bioenergy_electricity_share_pct,
+         other_renewables_excluding_bioenergy_electricity_share_pct) |>
+  pivot_longer(
+    cols = -c(country, year),
+    names_to = "source",
+    values_to = "share"
+  ) |>
+  mutate(
+    source = str_remove(source, "_electricity_share_pct"),
+    source = if_else(source == "other_renewables_excluding_bioenergy",
+                     "other renewables", source),
+    source = factor(source, levels = c("coal", "gas", "oil", "nuclear",
+                                       "hydro", "wind", "solar",
+                                       "bioenergy", "other renewables")),
+    share = replace_na(share, 0)
+  )
+```
 
-
-
-
-
-
+```{r}
+energy_mix |>
+  ggplot(aes(x = year, y = share, fill = source)) +
+  geom_area() +
+  facet_wrap(~ country, ncol = 4) +
+  scale_fill_manual(values = c(
+    "coal" = "#4d4d4d", "gas" = "#8c8c8c", "oil" = "#bdbdbd",
+    "nuclear" = "#984ea3", "hydro" = "#377eb8", "wind" = "#4daf4a",
+    "solar" = "#ffd92f", "bioenergy" = "#a65628",
+    "other renewables" = "#66c2a5"
+  )) +
+  scale_x_continuous(breaks = c(2000, 2010, 2020)) +
+  scale_y_continuous(labels = scales::label_percent(scale = 1)) +
+  labs(
+    title = "China and India still rely on coal; the UK has nearly phased it out",
+    subtitle = "Share of electricity generation by source, 2000–2024",
+    x = "Year",
+    y = "Share of electricity",
+    fill = "Source",
+    caption = "Source: Our World in Data, Energy Dataset (2025)"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+Breaking electricity generation down by source shows why the countries in the first two graphs are moving at such different speeds. China and India still rely heavily on coal, which supplied roughly 60% and 75% of their electricity in 2024, though both have begun adding wind and solar. The United Kingdom has nearly phased out coal since 2000, replacing it with a combination of natural gas, wind and bioenergy, which explains its steep rise in the first graph. Ghana's falling renewable share reflects growing reliance on gas, as hydropower has not expanded fast enough to meet rising demand, while Pakistan has moved in the opposite direction from the UK by adding coal from about 2018. Together, these patterns suggest that the main policy question is not just whether countries add renewables, but what they are replacing: countries moving from coal to gas cut emissions only partly, while those still adding coal risk locking in high-emission power plants for decades
 
 
 
