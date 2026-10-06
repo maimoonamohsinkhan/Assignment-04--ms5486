@@ -123,5 +123,62 @@ energy_mix |>
 Breaking electricity generation down by source shows why the countries in the first two graphs are moving at such different speeds. China and India still rely heavily on coal, which supplied roughly 60% and 75% of their electricity in 2024, though both have begun adding wind and solar. The United Kingdom has nearly phased out coal since 2000, replacing it with a combination of natural gas, wind and bioenergy, which explains its steep rise in the first graph. Ghana's falling renewable share reflects growing reliance on gas, as hydropower has not expanded fast enough to meet rising demand, while Pakistan has moved in the opposite direction from the UK by adding coal from about 2018. Together, these patterns suggest that the main policy question is not just whether countries add renewables, but what they are replacing: countries moving from coal to gas cut emissions only partly, while those still adding coal risk locking in high-emission power plants for decades
 
 
+### Graph 4: Does Wealth Predict Cleaner Electricity?
+
+```{r}
+countries_2022 <- energy |>
+  filter(year == 2022,
+         !is.na(iso_code),
+         !str_starts(iso_code, "OWID"),
+         !is.na(gdp),
+         !is.na(renewables_electricity_share_pct)) |>
+  mutate(
+    gdp_per_capita = gdp / population,
+    highlight = country %in% c("United States", "China", "India", "United Kingdom",
+                               "Norway", "Pakistan", "Ghana")
+  )
+
+countries_2022 |>
+  ggplot(aes(x = gdp_per_capita, y = renewables_electricity_share_pct)) +
+  geom_point(data = function(d) filter(d, !highlight),
+             color = "grey80", size = 1.5, alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE, color = "grey40",
+              linetype = "dashed", linewidth = 0.7) +
+  geom_point(data = function(d) filter(d, highlight),
+             aes(color = country, size = population), alpha = 0.85) +
+  ggrepel::geom_label_repel(data = function(d) filter(d, highlight),
+                            aes(label = country, color = country),
+                            size = 3.3, fill = "white", label.size = 0,
+                            box.padding = 0.8, point.padding = 0.6,
+                            min.segment.length = 0, segment.color = "grey50",
+                            seed = 42, show.legend = FALSE) +
+  scale_x_log10(labels = scales::label_dollar(accuracy = 1)) +
+  scale_y_continuous(limits = c(0, 100),
+                     labels = scales::label_percent(scale = 1)) +
+  scale_size_continuous(range = c(2, 6),
+                        labels = scales::label_number(scale = 1e-6, suffix = "M",
+                                                      big.mark = ",")) +
+  scale_color_brewer(palette = "Dark2") +
+  guides(color = "none") +
+  labs(
+    title = "Wealth does not predict cleaner electricity",
+    subtitle = "GDP per person vs. renewable share of electricity, 2022\nEach gray dot is a country; dashed line shows the overall trend",
+    x = "GDP per person (inflation-adjusted international $, log scale)",
+    y = "Renewable share of electricity",
+    size = "Population",
+    caption = "Source: Our World in Data, Energy Dataset (2025)"
+  ) +
+  theme_minimal() +
+  theme(panel.grid.minor = element_blank())
+```
+The final graph steps back to ask whether wealthier countries generally have cleaner electricity, comparing GDP per person with renewable share across all countries with available data in 2022. The answer is no: the trend line slopes slightly downward, and countries at every income level range from almost no renewable electricity to nearly 100%. Many lower-income countries rely heavily on hydropower, while some high-income countries, particularly oil and gas producers, generate almost none from renewables. Among the seven focus countries, Norway sits far above the trend, while the United States, China and India fall below it, despite large differences in income. Together, the four graphs suggest that the clean energy transition depends less on how rich a country is than on its natural resources and the policy choices it makes about what replaces fossil fuels
+
+
+
+
+
+
+
+
 
 
