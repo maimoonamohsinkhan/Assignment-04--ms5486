@@ -9,23 +9,47 @@ execute:
   message: false
 ---
 
-## Quarto
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
 ```{r}
-1 + 1
+library (tidyverse)
+energy <- read_csv("data/owid_energy.csv") 
+
+```
+Focusing on renewable energy in seven countries from 2000 onward 
+```{r}
+energy_sub <-energy |>
+    filter(country %in% c("United States", "China", "India", "United Kingdom", "Norway", "Pakistan", "Ghana"),
+         year >= 2000)
 ```
 
-You can add options to executable code like this
+### Graph 1: Renewable share of electricity
 
 ```{r}
-#| echo: false
-2 * 2
+energy_sub |>
+  ggplot(aes(x = year, y = renewables_electricity_share_pct, color = country)) +
+  geom_line(linewidth = 1, alpha = 0.8) +
+  scale_y_continuous(
+    limits = c(0, 100),
+    labels = scales::label_percent(scale = 1)
+  ) +
+  scale_color_brewer(palette = "Dark2") +
+  labs(
+    title = "Renewables' share of electricity is rising in most countries, but falling in Ghana",
+    subtitle = "Share of electricity generated from renewable sources, 2000–2025",
+    x = "Year",
+    y = "Renewable share of electricity",
+    color = "Country",
+    caption = "Source: Our World in Data, Energy Dataset (2025)"
+  ) +
+  theme_minimal()
 ```
+Since 2000, the share of electricity generated from renewable sources has risen in most of the countries examined. The United Kingdom shows the fastest transition, growing from under 5% to over 50%, largely driven by the expansion of wind power, while China, Pakistan and the United States show slower but steady gains. Norway has remained close to 100% throughout because of its long-standing reliance on hydropower. Ghana is the major exception: its renewable share fell from about 90% to under 40% as rising electricity demand was met mainly by fossil fuels rather than new renewable capacity. This suggests that for fast-growing economies, the policy challenge is not only adding renewables but adding them quickly enough to keep pace with demand.
 
-The `echo: false` option disables the printing of code (only output is displayed).
+
+
+
+
+
+
+
+
+
